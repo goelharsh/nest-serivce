@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ./docker/api-gateway/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - mongodb
+      - redis
+      - nats
+
+  client-service:
+    build:
+      context: .
+      dockerfile: ./docker/client-service/Dockerfile
+    depends_on:
+      - mongodb
+      - nats
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: ./docker/auth-service/Dockerfile
+    depends_on:
+      - mongodb
+      - redis
+      - nats
+
+  database-service:
+    build:
+      context: .
+      dockerfile: ./docker/database-service/Dockerfile
+    depends_on:
+      - mongodb
+      - nats
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: ./docker/notification-service/Dockerfile
+    depends_on:
+      - mongodb
+      - redis
+      - nats
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  nats:
+    image: nats:latest
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+
+volumes:
+  mongodb_data:
